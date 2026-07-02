@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flagmaps · Atlas de Banderas</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header id="topbar">
+      <div class="brand">
+        <h1>Atlas <em>de</em> Banderas</h1>
+        <span class="sub">— natural earth · d3 —</span>
+      </div>
+      <div class="controls">
+        <select id="map-select" title="Mapa"></select>
+        <nav id="mode-bar" aria-label="Modo de vista">
+          <button data-mode="flags" class="mode active">Banderas</button>
+          <button data-mode="area" class="mode">Superficie</button>
+          <button data-mode="pop" class="mode">Población</button>
+          <button data-mode="density" class="mode">Densidad</button>
+        </nav>
+        <nav id="view-bar" aria-label="Forma de comparar" title="Forma de comparar">
+          <button data-view="list" class="view active">Lista</button>
+          <button data-view="strip" class="view">Línea</button>
+        </nav>
+        <input
+          id="search"
+          list="country-list"
+          placeholder="Buscar país…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <datalist id="country-list"></datalist>
+        <button id="btn-all" title="Bandera en todos los países">Todas</button>
+        <button id="btn-clear" title="Quitar todas las banderas">Limpiar</button>
+        <button id="btn-reset-view" title="Restablecer zoom">⌖</button>
+        <span class="sep"></span>
+        <button id="btn-svg" class="accent" title="Exportar SVG (vectorial, para imprimir)">SVG</button>
+        <button id="btn-png" class="accent" title="Exportar PNG (alta resolución)">PNG</button>
+      </div>
+      <div class="counter" title="Países con bandera">
+        <span id="count">0</span><span class="total">/&nbsp;<span id="total">0</span></span>
+      </div>
+    </header>
+
+    <main id="content">
+      <div id="map-col">
+        <div id="map-container">
+          <div id="map-viewport" aria-label="Mapa interactivo"></div>
+          <div id="legend" hidden></div>
+        </div>
+        <div id="compare" hidden></div>
+      </div>
+      <aside id="ranking" hidden>
+        <h2 id="ranking-title"></h2>
+        <ol id="ranking-list"></ol>
+      </aside>
+    </main>
+
+    <div id="tooltip" hidden>
+      <div class="tt-head">
+        <img id="tt-flag" alt="" />
+        <span id="tt-name"></span>
+      </div>
+      <dl id="tt-stats" hidden>
+        <div data-metric="area"><dt>Superficie</dt><dd></dd></div>
+        <div data-metric="pop"><dt>Población</dt><dd></dd></div>
+        <div data-metric="density"><dt>Densidad</dt><dd></dd></div>
+      </dl>
+    </div>
+
+    <footer id="statusbar">
+      <span><b>clic</b> bandera</span>
+      <span><b>rueda</b> zoom</span>
+      <span><b>arrastrar</b> mover</span>
+      <span class="credit"
+        >datos: Natural Earth · Banco Mundial (población y superficie) · banderas: flagcdn</span
+      >
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

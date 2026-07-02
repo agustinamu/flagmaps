@@ -1,0 +1,15 @@
+{
+  "world": {
+    "name": "Mapamundi",
+    "source": "50m",
+    "filter": "CONTINENT !== 'Antarctica'",
+    "projection": { "type": "equalEarth" }
+  },
+  "europe": {
+    "name": "Europa",
+    "source": "50m",
+    "filter": "CONTINENT === 'Europe' && NAME !== 'Russia'",
+    "projection": { "type": "conicConformal", "rotate": [-15, 0], "parallels": [40, 60] },
+    "clipBbox": [-25, 33, 45, 72]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "flagmaps",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "build:maps": "node scripts/build-maps.mjs",
+    "build:flags": "node scripts/sync-flags.mjs",
+    "build:stats": "node scripts/build-stats.mjs"
+  },
+  "dependencies": {
+    "d3-geo": "^3.1.0",
+    "topojson-client": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/d3-geo": "^3.1.0",
+    "@types/geojson": "^7946.0.14",
+    "@types/topojson-client": "^3.1.0",
+    "@types/topojson-specification": "^1.0.5",
+    "mapshaper": "^0.6.0",
+    "typescript": "~5.7.0",
+    "vite": "^6.0.0"
+  }
+}
