@@ -22,6 +22,6 @@
     "@types/topojson-specification": "^1.0.5",
     "mapshaper": "^0.6.0",
     "typescript": "~5.7.0",
-    "vite": "^6.0.0"
+    "vite": "^8.1.3"
   }
 }
