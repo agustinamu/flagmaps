@@ -31,7 +31,7 @@ export function flagUrl(iso: string): string {
 // Devuelve un tamaño normalizado (alto = 100) con la proporción real de la
 // bandera. Solo importa la proporción, y tamaños intrínsecos enormes
 // (Marruecos declara 90000×60000) rompen librsvg al abrir el SVG exportado.
-function parseSize(svgText: string): { w: number; h: number } {
+export function parseSize(svgText: string): { w: number; h: number } {
   let w = 3;
   let h = 2; // proporción de bandera más habitual
   const vb = svgText.match(/viewBox="([\d.\s+-]+)"/);

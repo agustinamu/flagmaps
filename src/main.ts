@@ -24,6 +24,8 @@ import {
 import { paintChoropleth, clearChoropleth, renderLegend, type Choropleth } from './choropleth';
 import { renderRanking, highlightRanking } from './ranking';
 import { renderCompare, highlightCompare } from './compare';
+import { copyFlagPng, downloadFlagSvg } from './flagexport';
+import { showContextMenu, toast } from './menu';
 
 const $ = <T extends HTMLElement>(sel: string): T => {
   const el = document.querySelector<T>(sel);
@@ -92,6 +94,26 @@ async function toggle(c: CountryEl): Promise<void> {
     await select(c);
   }
   persist();
+}
+
+async function copyFlag(c: CountryEl): Promise<void> {
+  try {
+    await copyFlagPng(c.iso);
+    toast(`Bandera de ${c.name} copiada (PNG)`);
+  } catch (err) {
+    console.error(err);
+    toast('No se pudo copiar la bandera', 'bad');
+  }
+}
+
+async function downloadFlag(c: CountryEl): Promise<void> {
+  try {
+    await downloadFlagSvg(c.iso, c.name);
+    toast(`SVG de ${c.name} descargado`);
+  } catch (err) {
+    console.error(err);
+    toast('No se pudo descargar el SVG', 'bad');
+  }
 }
 
 function countryFromEvent(e: Event): CountryEl | undefined {
@@ -215,6 +237,19 @@ async function showMap(def: MapDef): Promise<void> {
       highlightRanking(rankingList, c.iso);
       highlightCompare(compareEl, c.iso);
     }
+  });
+
+  // Clic derecho sobre un país: copiar su bandera (PNG, pegable en Canva/chat)
+  // o descargar el SVG vectorial. Menú fijo porque el tooltip flotante sigue
+  // al cursor y no se puede pulsar.
+  map.svg.addEventListener('contextmenu', (e) => {
+    const c = countryFromEvent(e);
+    if (!c) return;
+    e.preventDefault();
+    showContextMenu(e.clientX, e.clientY, [
+      { label: `Copiar bandera PNG · ${c.name}`, run: () => void copyFlag(c) },
+      { label: 'Descargar SVG (Canva Uploads / Word)', run: () => void downloadFlag(c) },
+    ]);
   });
 
   let hoveredKey = '';
