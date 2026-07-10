@@ -1,14 +1,7 @@
 import './style.css';
 import { MAPS, type MapDef } from './data/maps';
 import { loadMap, type CountryEl, type LoadedMap } from './geo';
-import {
-  applyFlag,
-  removeFlag,
-  flagUrl,
-  clusterPieces,
-  mapDiagonal,
-  CLUSTER_GAP,
-} from './flags';
+import { applyFlag, removeFlag, flagThumbUrl, countryClusters } from './flags';
 import { loadSelection, saveSelection } from './state';
 import { enableZoomPan, type ZoomPan } from './zoompan';
 import { exportPNG, exportSVG } from './exporter';
@@ -75,14 +68,16 @@ function persist(): void {
   updateCounter();
 }
 
-async function select(c: CountryEl): Promise<void> {
+async function select(c: CountryEl): Promise<boolean> {
   ctx.selected.add(c.iso);
   try {
     await applyFlag(ctx.map.svg, c);
+    return true;
   } catch (err) {
     // Bandera inaccesible (red caída, SVG ausente): revertir, no dejar estado fantasma.
     ctx.selected.delete(c.iso);
     console.error(err);
+    return false;
   }
 }
 
@@ -91,7 +86,8 @@ async function toggle(c: CountryEl): Promise<void> {
     ctx.selected.delete(c.iso);
     removeFlag(ctx.map.svg, c);
   } else {
-    await select(c);
+    // El clic es la única vía con feedback: select() revierte en silencio si falla.
+    if (!(await select(c))) toast(`No se pudo cargar la bandera de ${c.name}`, 'bad');
   }
   persist();
 }
@@ -136,7 +132,7 @@ function flash(c: CountryEl): void {
 
 // Centra la vista en la masa principal del país (Francia → el hexágono).
 function focusCountry(c: CountryEl): void {
-  const clusters = clusterPieces(c.pieces, mapDiagonal(ctx.map.svg) * CLUSTER_GAP);
+  const clusters = countryClusters(ctx.map.svg, c);
   if (!clusters.length) return;
   const main = clusters.reduce((a, b) => (b.box.w * b.box.h > a.box.w * a.box.h ? b : a));
   ctx.zoomPan.focus(main.box);
@@ -203,6 +199,7 @@ let loadSeq = 0;
 
 async function showMap(def: MapDef): Promise<void> {
   const seq = ++loadSeq;
+  container.textContent = 'Cargando mapa…';
   const map = await loadMap(def, container);
   if (seq !== loadSeq) return; // el usuario cambió de mapa mientras cargaba
   const selected = loadSelection(def.id);
@@ -264,7 +261,7 @@ async function showMap(def: MapDef): Promise<void> {
     if (key !== hoveredKey) {
       hoveredKey = key;
       ttName.textContent = c.name;
-      ttFlag.src = flagUrl(c.iso);
+      ttFlag.src = flagThumbUrl(c.iso);
       fillTooltipStats(c.iso);
     }
     tooltip.hidden = false;
@@ -296,7 +293,7 @@ function init(): void {
   );
   mapSelect.addEventListener('change', () => {
     const def = MAPS.find((m) => m.id === mapSelect.value);
-    if (def) void showMap(def);
+    if (def) showMap(def).catch(() => toast('No se pudo cargar el mapa. Recarga la página.', 'bad'));
   });
 
   modeBar.addEventListener('click', (e) => {
@@ -304,7 +301,11 @@ function init(): void {
     if (!btn) return;
     const m = btn.dataset.mode ?? 'flags';
     mode = isMetric(m) ? m : 'flags';
-    for (const b of modeBar.querySelectorAll('.mode')) b.classList.toggle('active', b === btn);
+    for (const b of modeBar.querySelectorAll('.mode')) {
+      const on = b === btn;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    }
     applyMode().catch(console.error);
   });
 
@@ -312,7 +313,11 @@ function init(): void {
     const btn = (e.target as Element).closest<HTMLButtonElement>('button[data-view]');
     if (!btn) return;
     view = btn.dataset.view === 'strip' ? 'strip' : 'list';
-    for (const b of viewBar.querySelectorAll('.view')) b.classList.toggle('active', b === btn);
+    for (const b of viewBar.querySelectorAll('.view')) {
+      const on = b === btn;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    }
     applyMode().catch(console.error);
   });
 
@@ -320,19 +325,30 @@ function init(): void {
     const query = normalize(searchInput.value.trim());
     if (!query) return;
     const match = [...ctx.map.countries.values()].find((c) => normalize(c.name) === query);
-    if (!match) return;
-    if (mode === 'flags') void toggle(match);
+    if (!match) {
+      toast('País no encontrado', 'bad');
+      return;
+    }
+    // Buscar nunca des-selecciona: select() + persist() (select no persiste, toggle sí).
+    if (mode === 'flags') void select(match).then(persist);
     focusCountry(match);
     searchInput.value = '';
   });
 
-  $('#btn-all').addEventListener('click', async () => {
-    const pending = [...ctx.map.countries.values()].filter((c) => !ctx.selected.has(c.iso));
-    await Promise.all(pending.map(select));
-    persist();
+  $('#btn-all').addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    btn.disabled = true;
+    try {
+      const pending = [...ctx.map.countries.values()].filter((c) => !ctx.selected.has(c.iso));
+      await Promise.all(pending.map(select));
+      persist();
+    } finally {
+      btn.disabled = false;
+    }
   });
 
   $('#btn-clear').addEventListener('click', () => {
+    if (ctx.selected.size > 10 && !confirm('¿Quitar todas las banderas?')) return;
     for (const c of ctx.map.countries.values()) removeFlag(ctx.map.svg, c);
     ctx.selected.clear();
     persist();
@@ -347,7 +363,7 @@ function init(): void {
     .then((s) => (stats = s))
     .catch(console.error);
 
-  void showMap(MAPS[0]);
+  showMap(MAPS[0]).catch(() => toast('No se pudo cargar el mapa. Recarga la página.', 'bad'));
 }
 
 init();

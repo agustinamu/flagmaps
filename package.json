@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "build:maps": "node scripts/build-maps.mjs",
     "build:flags": "node scripts/sync-flags.mjs",
+    "build:flags:thumb": "node scripts/build-flag-thumbs.mjs",
     "build:stats": "node scripts/build-stats.mjs"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "@types/topojson-client": "^3.1.0",
     "@types/topojson-specification": "^1.0.5",
     "mapshaper": "^0.7.34",
+    "sharp": "^0.35.3",
     "typescript": "^6.0.3",
     "vite": "^8.1.3"
   }

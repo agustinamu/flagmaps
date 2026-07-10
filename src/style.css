@@ -1,5 +1,7 @@
 /* ── Sala de cartografía: tinta nocturna, latón y papel ─────────────── */
+/* Paleta canónica del portal (docs/guia-estilo.md §2 en el repo ekain): mismos nombres y valores en los tres repos. */
 :root {
+  color-scheme: dark;
   --ink: #0b131c;
   --ink-2: #101b27;
   --ocean: #0e1822;
@@ -10,8 +12,9 @@
   --brass-soft: #8a6f3d;
   --paper: #ece5d3;
   --paper-dim: #9a937f;
-  --display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
-  --mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --bad: #d47d6a;
+  --display: 'Fraunces', Georgia, serif;
+  --mono: 'IBM Plex Mono', monospace;
 }
 
 * {
@@ -116,6 +119,10 @@ body {
   outline: none;
 }
 
+#map-select:focus-visible {
+  border-color: var(--paper);
+}
+
 #search::placeholder {
   color: var(--paper-dim);
 }
@@ -138,7 +145,7 @@ button {
 
 button:hover {
   border-color: var(--brass);
-  background: rgba(210, 161, 76, 0.1);
+  background: rgba(210, 161, 76, 0.08);
 }
 
 button.accent {
@@ -252,6 +259,9 @@ body.mode-data #view-bar {
   height: 100%;
   display: block;
   cursor: grab;
+  /* App a pantalla completa sin scroll de página: el mapa gestiona todos los
+     gestos táctiles (paneo y pinza); sin esto el navegador los cancela. */
+  touch-action: none;
 }
 
 #map-viewport svg:active {
@@ -358,7 +368,7 @@ svg.data-mode .country:hover {
   margin-top: 0.45rem;
   padding-top: 0.35rem;
   border-top: 1px solid rgba(210, 161, 76, 0.2);
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   letter-spacing: 0.03em;
   color: var(--paper-dim);
 }
@@ -416,7 +426,7 @@ svg.data-mode .country:hover {
 }
 
 .cmp .nm {
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   letter-spacing: 0.04em;
   max-width: 100%;
   overflow: hidden;
@@ -425,7 +435,7 @@ svg.data-mode .country:hover {
 }
 
 .cmp .vl {
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   color: var(--brass);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -503,6 +513,25 @@ svg.data-mode .country:hover {
   white-space: nowrap;
 }
 
+/* En viewports estrechos los 20rem del ranking dejarían el mapa en ~40px:
+   pasa abajo con altura acotada y el mapa conserva todo el ancho. */
+@media (max-width: 720px) {
+  #content {
+    flex-direction: column;
+  }
+
+  #map-col {
+    min-height: 0;
+  }
+
+  #ranking {
+    width: auto;
+    max-height: 45%;
+    border-left: none;
+    border-top: 1px solid var(--brass-soft);
+  }
+}
+
 @keyframes flash {
   0%,
   60% {
@@ -561,7 +590,7 @@ svg.data-mode .country:hover {
   color: var(--paper-dim);
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   align-self: baseline;
 }
 
@@ -586,7 +615,7 @@ svg.data-mode .country:hover {
   display: flex;
   gap: 1.6rem;
   padding: 0.4rem 1.4rem;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--paper-dim);
@@ -597,6 +626,15 @@ svg.data-mode .country:hover {
 #statusbar b {
   color: var(--brass);
   font-weight: 500;
+}
+
+#statusbar .back {
+  color: var(--paper-dim);
+  text-decoration: none;
+}
+
+#statusbar .back:hover {
+  color: var(--brass);
 }
 
 #statusbar .credit {
@@ -665,6 +703,6 @@ svg.data-mode .country:hover {
 }
 
 .toast[data-kind='bad'] {
-  border-color: #b4553f;
-  color: #f0c8bd;
+  border-color: var(--bad);
+  color: var(--paper);
 }

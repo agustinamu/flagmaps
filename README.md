@@ -20,6 +20,7 @@ Los datos generados viven en `public/` y se regeneran con:
 |---|---|---|
 | `npm run build:maps` | `public/data/<mapa>.json` (TopoJSON) | Natural Earth 50m (caché en `data/cache/`) |
 | `npm run build:flags` | `public/flags/*.svg` | flagcdn.com |
+| `npm run build:flags:thumb` | `public/flags/thumb/*.webp` (320px, para el tooltip) | `public/flags/*.svg` (sharp) |
 | `npm run build:stats` | `public/data/stats.json` | Banco Mundial (`SP.POP.TOTL`, `AG.SRF.TOTL.K2`); respaldo Natural Earth para territorios sin dato (Taiwán, Sáhara Occidental…) |
 
 Añadir un mapa = una entrada en `data/maps.config.json` + `npm run build:maps`.

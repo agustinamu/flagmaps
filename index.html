@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flagmaps · Atlas de Banderas</title>
+    <title>Ekain · Atlas de Banderas</title>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>"
@@ -14,6 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <link rel="preload" href="data/world.json" as="fetch" crossorigin />
   </head>
   <body>
     <header id="topbar">
@@ -24,14 +25,14 @@
       <div class="controls">
         <select id="map-select" title="Mapa"></select>
         <nav id="mode-bar" aria-label="Modo de vista">
-          <button data-mode="flags" class="mode active">Banderas</button>
-          <button data-mode="area" class="mode">Superficie</button>
-          <button data-mode="pop" class="mode">Población</button>
-          <button data-mode="density" class="mode">Densidad</button>
+          <button data-mode="flags" class="mode active" aria-pressed="true">Banderas</button>
+          <button data-mode="area" class="mode" aria-pressed="false">Superficie</button>
+          <button data-mode="pop" class="mode" aria-pressed="false">Población</button>
+          <button data-mode="density" class="mode" aria-pressed="false">Densidad</button>
         </nav>
         <nav id="view-bar" aria-label="Forma de comparar" title="Forma de comparar">
-          <button data-view="list" class="view active">Lista</button>
-          <button data-view="strip" class="view">Línea</button>
+          <button data-view="list" class="view active" aria-pressed="true">Lista</button>
+          <button data-view="strip" class="view" aria-pressed="false">Línea</button>
         </nav>
         <input
           id="search"
@@ -56,7 +57,7 @@
     <main id="content">
       <div id="map-col">
         <div id="map-container">
-          <div id="map-viewport" aria-label="Mapa interactivo"></div>
+          <div id="map-viewport" role="region" aria-label="Mapa interactivo"></div>
           <div id="legend" hidden></div>
         </div>
         <div id="compare" hidden></div>
@@ -80,9 +81,11 @@
     </div>
 
     <footer id="statusbar">
+      <a class="back" href="https://ekain.amutxastegi.com/">← herramientas</a>
       <span><b>clic</b> bandera</span>
-      <span><b>rueda</b> zoom</span>
+      <span><b>rueda · pellizco</b> zoom</span>
       <span><b>arrastrar</b> mover</span>
+      <span><b>clic dcho</b> exportar bandera</span>
       <span class="credit"
         >datos: Natural Earth · Banco Mundial (población y superficie) · banderas: flagcdn</span
       >

@@ -5,7 +5,7 @@
 // enseña el hexágono, no un bbox que abarque la Guayana) y hereda el color de
 // clase del choropleth.
 import type { LoadedMap } from './geo';
-import { clusterPieces, mapDiagonal, CLUSTER_GAP } from './flags';
+import { countryClusters } from './flags';
 import { formatCompact, formatValue, yearLabel, type Metric, type StatsFile } from './stats';
 import type { Choropleth } from './choropleth';
 
@@ -27,13 +27,12 @@ export function renderCompare(
     .sort((a, b) => b[1] - a[1]);
   if (!rows.length) return;
   const vmax = rows[0][1];
-  const maxGap = mapDiagonal(map.svg) * CLUSTER_GAP;
 
   strip.replaceChildren(
     ...rows.flatMap(([iso, value]) => {
       const c = map.countries.get(iso);
       if (!c) return [];
-      const clusters = clusterPieces(c.pieces, maxGap);
+      const clusters = countryClusters(map.svg, c);
       if (!clusters.length) return [];
       const main = clusters.reduce((a, b) => (b.box.w * b.box.h > a.box.w * a.box.h ? b : a));
 
@@ -66,7 +65,13 @@ export function renderCompare(
       val.textContent = formatCompact(metric, value);
       caption.append(name, val);
       fig.append(svg, caption);
+      fig.tabIndex = 0;
       fig.addEventListener('click', () => onSelect(iso));
+      fig.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        onSelect(iso);
+      });
       return [fig];
     }),
   );

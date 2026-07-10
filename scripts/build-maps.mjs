@@ -52,6 +52,7 @@ for (const [id, def] of Object.entries(config)) {
     `-each "${SANITIZE}"`,
     '-filter-fields iso,name,continent,subregion',
     '-rename-layers countries',
+    '-simplify 40% keep-shapes',
     `-o format=topojson quantization=1e5 "${out}"`,
   ]
     .filter(Boolean)

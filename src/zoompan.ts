@@ -41,24 +41,30 @@ export function enableZoomPan(svg: SVGSVGElement): ZoomPan {
     };
   };
 
+  // Escala el viewBox por factor manteniendo fijo el punto p (en unidades del mapa).
+  const zoomAt = (p: { x: number; y: number }, factor: number) => {
+    const newW = Math.min(home.w, Math.max(home.w / MAX_ZOOM, vb.w * factor));
+    const scale = newW / vb.w;
+    vb.x = p.x - (p.x - vb.x) * scale;
+    vb.y = p.y - (p.y - vb.y) * scale;
+    vb.w = newW;
+    vb.h *= scale;
+    apply();
+  };
+
   svg.addEventListener(
     'wheel',
     (e) => {
       e.preventDefault();
-      const factor = e.deltaY > 0 ? 1.25 : 0.8;
-      const newW = Math.min(home.w, Math.max(home.w / MAX_ZOOM, vb.w * factor));
-      const scale = newW / vb.w;
-      const p = toSvgPoint(e);
-      vb.x = p.x - (p.x - vb.x) * scale;
-      vb.y = p.y - (p.y - vb.y) * scale;
-      vb.w = newW;
-      vb.h *= scale;
-      apply();
+      zoomAt(toSvgPoint(e), e.deltaY > 0 ? 1.25 : 0.8);
     },
     { passive: false },
   );
 
   let start: { clientX: number; clientY: number; vbX: number; vbY: number } | null = null;
+  // Punteros activos sobre el mapa: con dos, el gesto es pinza (zoom táctil).
+  const pointers = new Map<number, { clientX: number; clientY: number }>();
+  let pinch: { dist: number; mid: { clientX: number; clientY: number } } | null = null;
 
   // Paneo con listeners en window (no setPointerCapture): capturar el puntero
   // en el <svg> redirige el pointerup/click al propio <svg>, con lo que el
@@ -66,6 +72,28 @@ export function enableZoomPan(svg: SVGSVGElement): ZoomPan {
   // nunca con ratón real. En window seguimos el arrastre aunque el cursor
   // salga del mapa, y el <svg> conserva el país como target del click.
   const onMove = (e: PointerEvent) => {
+    const tracked = pointers.get(e.pointerId);
+    if (tracked) {
+      tracked.clientX = e.clientX;
+      tracked.clientY = e.clientY;
+    }
+    if (pointers.size >= 2) {
+      dragged = true; // el tap que cierra una pinza no debe togglear bandera
+      const [a, b] = [...pointers.values()];
+      const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      const mid = { clientX: (a.clientX + b.clientX) / 2, clientY: (a.clientY + b.clientY) / 2 };
+      if (pinch) {
+        // Paneo con el desplazamiento del punto medio…
+        const rect = svg.getBoundingClientRect();
+        vb.x -= ((mid.clientX - pinch.mid.clientX) / rect.width) * vb.w;
+        vb.y -= ((mid.clientY - pinch.mid.clientY) / rect.height) * vb.h;
+        // …y zoom según el cambio de distancia entre dedos (misma matemática que la rueda).
+        if (dist && pinch.dist) zoomAt(toSvgPoint(mid), pinch.dist / dist);
+        else apply();
+      }
+      pinch = { dist, mid };
+      return;
+    }
     if (!start) return;
     const dx = e.clientX - start.clientX;
     const dy = e.clientY - start.clientY;
@@ -77,7 +105,16 @@ export function enableZoomPan(svg: SVGSVGElement): ZoomPan {
     apply();
   };
 
-  const onUp = () => {
+  const onUp = (e: PointerEvent) => {
+    pointers.delete(e.pointerId);
+    pinch = null;
+    if (pointers.size === 1) {
+      // Al soltar un dedo de la pinza, el que queda continúa el paneo sin salto.
+      const [p] = [...pointers.values()];
+      start = { clientX: p.clientX, clientY: p.clientY, vbX: vb.x, vbY: vb.y };
+      return;
+    }
+    if (pointers.size) return;
     start = null;
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup', onUp);
@@ -86,8 +123,16 @@ export function enableZoomPan(svg: SVGSVGElement): ZoomPan {
 
   svg.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
-    start = { clientX: e.clientX, clientY: e.clientY, vbX: vb.x, vbY: vb.y };
-    dragged = false;
+    pointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+    if (pointers.size >= 2) {
+      // Segundo dedo: cancelar el paneo de uno; la pinza arranca en el primer move.
+      start = null;
+      pinch = null;
+    } else {
+      start = { clientX: e.clientX, clientY: e.clientY, vbX: vb.x, vbY: vb.y };
+      dragged = false;
+    }
+    // Registrar dos veces el mismo handler es inocuo (addEventListener deduplica).
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);

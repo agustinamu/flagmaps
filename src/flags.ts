@@ -14,7 +14,7 @@ const MAX_STRETCH = 1.8;
 const MIN_TILE = 1;
 // Separación máxima entre piezas de un mismo clúster, como fracción de la
 // diagonal del mapa (~500 km en el mapamundi): por debajo comparten bandera.
-export const CLUSTER_GAP = 0.012;
+const CLUSTER_GAP = 0.012;
 
 interface FlagAsset {
   href: string; // data URL
@@ -26,6 +26,12 @@ const assetCache = new Map<string, Promise<FlagAsset>>();
 
 export function flagUrl(iso: string): string {
   return `flags/${iso}.svg`;
+}
+
+// Miniatura WebP (320px) para el tooltip: evita descargar el SVG completo
+// (hasta 249 KB) para pintar ~27×18 px. Generada por scripts/build-flag-thumbs.mjs.
+export function flagThumbUrl(iso: string): string {
+  return `flags/thumb/${iso}.webp`;
 }
 
 // Devuelve un tamaño normalizado (alto = 100) con la proporción real de la
@@ -111,7 +117,7 @@ function boxUnion(a: Box, b: Box): Box {
 
 // Agrupa piezas cuyos bbox estén a menos de maxGap; fusión iterativa para
 // que las cadenas isla→isla→continente acaben en el mismo clúster.
-export function clusterPieces(pieces: SVGPathElement[], maxGap: number): Cluster[] {
+function clusterPieces(pieces: SVGPathElement[], maxGap: number): Cluster[] {
   const clusters: Cluster[] = [];
   for (const piece of pieces) {
     const b = piece.getBBox();
@@ -134,11 +140,25 @@ export function clusterPieces(pieces: SVGPathElement[], maxGap: number): Cluster
   return clusters;
 }
 
-export function mapDiagonal(svg: SVGSVGElement): number {
+function mapDiagonal(svg: SVGSVGElement): number {
   const vb = (svg.dataset.homeViewbox || svg.getAttribute('viewBox') || '0 0 960 540')
     .split(/\s+/)
     .map(Number);
   return Math.hypot(vb[2], vb[3]);
+}
+
+// Los clústeres dependen solo de la geometría del mapa cargado, no de la
+// bandera ni la métrica: se memoizan por país. WeakMap: al recargar el mapa
+// los CountryEl se recrean y la caché vieja se libera sola.
+const clusterCache = new WeakMap<CountryEl, Cluster[]>();
+
+export function countryClusters(svg: SVGSVGElement, c: CountryEl): Cluster[] {
+  let clusters = clusterCache.get(c);
+  if (!clusters) {
+    clusters = clusterPieces(c.pieces, mapDiagonal(svg) * CLUSTER_GAP);
+    clusterCache.set(c, clusters);
+  }
+  return clusters;
 }
 
 export async function applyFlag(svg: SVGSVGElement, c: CountryEl): Promise<void> {
@@ -155,7 +175,7 @@ export async function applyFlag(svg: SVGSVGElement, c: CountryEl): Promise<void>
     defs.appendChild(image);
   }
 
-  const clusters = clusterPieces(c.pieces, mapDiagonal(svg) * CLUSTER_GAP);
+  const clusters = countryClusters(svg, c);
   clusters.forEach((cluster, idx) => {
     // Tamaño mínimo de tile: los patterns subpíxel (islotes diminutos) rompen
     // el render de librsvg (InvalidSize) al abrir el SVG exportado.

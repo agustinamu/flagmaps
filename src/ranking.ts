@@ -28,7 +28,13 @@ export function renderRanking(
       value.className = 'vl';
       value.textContent = formatValue(metric, r.value);
       li.append(rank, name, value);
+      li.tabIndex = 0;
       li.addEventListener('click', () => onSelect(r.iso));
+      li.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        onSelect(r.iso);
+      });
       return li;
     }),
   );

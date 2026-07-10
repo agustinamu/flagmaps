@@ -8,10 +8,15 @@ export interface MenuItem {
 }
 
 let openMenu: HTMLElement | null = null;
+let onKey: ((e: KeyboardEvent) => void) | null = null;
 
 function closeMenu(): void {
   openMenu?.remove();
   openMenu = null;
+  if (onKey) {
+    document.removeEventListener('keydown', onKey);
+    onKey = null;
+  }
 }
 
 export function showContextMenu(x: number, y: number, items: MenuItem[]): void {
@@ -44,28 +49,29 @@ export function showContextMenu(x: number, y: number, items: MenuItem[]): void {
   const onAway = (e: Event) => {
     if (!menu.contains(e.target as Node)) closeMenu();
   };
-  const onKey = (e: KeyboardEvent) => {
+  const handleKey = (e: KeyboardEvent) => {
     if (e.key === 'Escape') closeMenu();
   };
+  onKey = handleKey;
   setTimeout(() => {
     document.addEventListener('pointerdown', onAway, { capture: true, once: true });
     window.addEventListener('scroll', closeMenu, { once: true, capture: true });
-    document.addEventListener('keydown', onKey, { once: true });
+    document.addEventListener('keydown', handleKey);
   });
 }
 
-let toastEl: HTMLElement | null = null;
+// Se crea al cargar el módulo (no perezosamente) para que la live region ya
+// exista en el árbol de accesibilidad antes del primer cambio de texto.
+const toastEl = document.createElement('div');
+toastEl.className = 'toast';
+toastEl.setAttribute('role', 'status');
+document.body.appendChild(toastEl);
 let toastTimer = 0;
 
 export function toast(message: string, kind: 'ok' | 'bad' = 'ok'): void {
-  if (!toastEl) {
-    toastEl = document.createElement('div');
-    toastEl.className = 'toast';
-    document.body.appendChild(toastEl);
-  }
   toastEl.textContent = message;
   toastEl.dataset.kind = kind;
   toastEl.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => toastEl?.classList.remove('show'), 2200);
+  toastTimer = window.setTimeout(() => toastEl.classList.remove('show'), 2200);
 }
