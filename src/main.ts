@@ -1,5 +1,12 @@
 import './style.css';
-import { MAPS, type MapDef } from './data/maps';
+import {
+  MAPS,
+  DEFAULT_PROJECTIONS,
+  PROJECTION_LABELS,
+  type MapDef,
+  type ProjectionDef,
+  type ProjectionType,
+} from './data/maps';
 import { loadMap, type CountryEl, type LoadedMap } from './geo';
 import { applyFlag, removeFlag, flagThumbUrl, countryClusters } from './flags';
 import { loadSelection, saveSelection } from './state';
@@ -35,6 +42,7 @@ const countEl = $('#count');
 const totalEl = $('#total');
 const searchInput = $<HTMLInputElement>('#search');
 const mapSelect = $<HTMLSelectElement>('#map-select');
+const projSelect = $<HTMLSelectElement>('#proj-select');
 const modeBar = $('#mode-bar');
 const viewBar = $('#view-bar');
 const legend = $('#legend');
@@ -58,6 +66,7 @@ let mode: Mode = 'flags';
 let view: View = 'list';
 let choropleth: Choropleth | undefined;
 let stats: StatsFile | undefined; // para el tooltip en cualquier modo
+let currentProjection: ProjectionDef = DEFAULT_PROJECTIONS.world ?? { type: 'equalEarth' };
 
 function updateCounter(): void {
   countEl.textContent = String(ctx.selected.size);
@@ -197,10 +206,10 @@ function fillTooltipStats(iso: string): void {
 
 let loadSeq = 0;
 
-async function showMap(def: MapDef): Promise<void> {
+async function showMap(def: MapDef, projection: ProjectionDef): Promise<void> {
   const seq = ++loadSeq;
   container.textContent = 'Cargando mapa…';
-  const map = await loadMap(def, container);
+  const map = await loadMap(def, projection, container);
   if (seq !== loadSeq) return; // el usuario cambió de mapa mientras cargaba
   const selected = loadSelection(def.id);
   ctx = { def, map, selected, zoomPan: enableZoomPan(map.svg) };
@@ -283,6 +292,7 @@ async function showMap(def: MapDef): Promise<void> {
 }
 
 function init(): void {
+  // Poblar selector de mapa (regiones geográficas) - todos los mapas disponibles
   mapSelect.replaceChildren(
     ...MAPS.map((m) => {
       const opt = document.createElement('option');
@@ -291,9 +301,41 @@ function init(): void {
       return opt;
     }),
   );
+
+  // Poblar selector de proyección con todas las proyecciones conocidas
+  const allProjTypes = Object.keys(PROJECTION_LABELS) as ProjectionType[];
+  projSelect.replaceChildren(
+    ...allProjTypes.map((type) => {
+      const opt = document.createElement('option');
+      opt.value = type;
+      opt.textContent = PROJECTION_LABELS[type];
+      return opt;
+    }),
+  );
+
+  // Establecer proyección inicial desde el mapa seleccionado
+  const initialMap = MAPS[0];
+  currentProjection = DEFAULT_PROJECTIONS[initialMap.id] ?? { type: 'equalEarth' };
+  projSelect.value = currentProjection.type;
+
   mapSelect.addEventListener('change', () => {
     const def = MAPS.find((m) => m.id === mapSelect.value);
-    if (def) showMap(def).catch(() => toast('No se pudo cargar el mapa. Recarga la página.', 'bad'));
+    if (def) {
+      // Al cambiar de mapa, volver a la proyección por defecto de ese mapa.
+      currentProjection = DEFAULT_PROJECTIONS[def.id] ?? { type: 'equalEarth' };
+      projSelect.value = currentProjection.type;
+      showMap(def, currentProjection).catch(() =>
+        toast('No se pudo cargar el mapa. Recarga la página.', 'bad'),
+      );
+    }
+  });
+
+  projSelect.addEventListener('change', () => {
+    // Conserva rotate/parallels de la proyección actual (útil si ya eran cónicas).
+    currentProjection = { ...currentProjection, type: projSelect.value as ProjectionType };
+    showMap(ctx.def, currentProjection).catch(() =>
+      toast('No se pudo cargar el mapa. Recarga la página.', 'bad'),
+    );
   });
 
   modeBar.addEventListener('click', (e) => {
@@ -329,7 +371,6 @@ function init(): void {
       toast('País no encontrado', 'bad');
       return;
     }
-    // Buscar nunca des-selecciona: select() + persist() (select no persiste, toggle sí).
     if (mode === 'flags') void select(match).then(persist);
     focusCountry(match);
     searchInput.value = '';
@@ -358,12 +399,13 @@ function init(): void {
   $('#btn-svg').addEventListener('click', () => exportSVG(ctx.map.svg, ctx.def.id));
   $('#btn-png').addEventListener('click', () => void exportPNG(ctx.map.svg, ctx.def.id));
 
-  // Las estadísticas alimentan el tooltip en todos los modos.
   loadStats()
     .then((s) => (stats = s))
     .catch(console.error);
 
-  showMap(MAPS[0]).catch(() => toast('No se pudo cargar el mapa. Recarga la página.', 'bad'));
+  showMap(initialMap, currentProjection).catch(() =>
+    toast('No se pudo cargar el mapa. Recarga la página.', 'bad'),
+  );
 }
 
 init();

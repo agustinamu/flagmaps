@@ -2,14 +2,37 @@
   "world": {
     "name": "Mapamundi",
     "source": "50m",
-    "filter": "CONTINENT !== 'Antarctica'",
-    "projection": { "type": "equalEarth" }
+    "filter": "CONTINENT !== 'Antarctica'"
   },
   "europe": {
     "name": "Europa",
     "source": "50m",
     "filter": "CONTINENT === 'Europe' && NAME !== 'Russia'",
-    "projection": { "type": "conicConformal", "rotate": [-15, 0], "parallels": [40, 60] },
     "clipBbox": [-25, 33, 45, 72]
+  },
+  "africa": {
+    "name": "África",
+    "source": "50m",
+    "filter": "CONTINENT === 'Africa'"
+  },
+  "asia": {
+    "name": "Asia",
+    "source": "50m",
+    "filter": "CONTINENT === 'Asia'"
+  },
+  "north-america": {
+    "name": "Norteamérica",
+    "source": "50m",
+    "filter": "CONTINENT === 'North America'"
+  },
+  "south-america": {
+    "name": "Sudamérica",
+    "source": "50m",
+    "filter": "CONTINENT === 'South America'"
+  },
+  "oceania": {
+    "name": "Oceanía",
+    "source": "50m",
+    "filter": "CONTINENT === 'Oceania'"
   }
 }

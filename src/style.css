@@ -106,7 +106,8 @@ body {
   border-color: var(--brass);
 }
 
-#map-select {
+#map-select,
+#proj-select {
   background: var(--ocean);
   border: 1px solid var(--brass);
   color: var(--brass);
@@ -119,7 +120,8 @@ body {
   outline: none;
 }
 
-#map-select:focus-visible {
+#map-select:focus-visible,
+#proj-select:focus-visible {
   border-color: var(--paper);
 }
 

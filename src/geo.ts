@@ -2,11 +2,26 @@
 // Cada polígono del MultiPolygon de un país se emite como un <path> propio
 // (pieza): los agujeros son anillos interiores del polígono y los gestiona
 // d3 directamente, sin parsear nada.
-import { geoConicConformal, geoEqualEarth, geoPath, type GeoProjection } from 'd3-geo';
+import {
+  geoAlbers,
+  geoAzimuthalEquidistant,
+  geoConicConformal,
+  geoConicEqualArea,
+  geoConicEquidistant,
+  geoEqualEarth,
+  geoEquirectangular,
+  geoMercator,
+  geoNaturalEarth1,
+  geoPath,
+  geoTransverseMercator,
+  type GeoConicProjection,
+  type GeoProjection,
+} from 'd3-geo';
+import { geoMollweide } from 'd3-geo-projection';
 import { feature } from 'topojson-client';
 import type { Topology } from 'topojson-specification';
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
-import type { MapDef, ProjectionDef } from './data/maps';
+import type { MapDef, ProjectionDef, ProjectionType } from './data/maps';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const W = 960;
@@ -32,18 +47,69 @@ export interface LoadedMap {
   countries: Map<string, CountryEl>;
 }
 
+// Proyecciones que aceptan .parallels() (las cónicas).
+const CONIC_TYPES: ReadonlySet<ProjectionType> = new Set([
+  'conicConformal',
+  'conicEqualArea',
+  'conicEquidistant',
+  'albersEqualArea',
+]);
+
 function makeProjection(def: ProjectionDef): GeoProjection {
+  let proj: GeoProjection;
+
   switch (def.type) {
     case 'equalEarth':
-      return geoEqualEarth();
+      proj = geoEqualEarth();
+      break;
+    case 'naturalEarth1':
+      proj = geoNaturalEarth1();
+      break;
+    case 'mollweide':
+      proj = geoMollweide();
+      break;
+    case 'equirectangular':
+      proj = geoEquirectangular();
+      break;
+    case 'mercator':
+      proj = geoMercator();
+      break;
+    case 'transverseMercator':
+      proj = geoTransverseMercator();
+      break;
+    case 'azimuthalEquidistant':
+      proj = geoAzimuthalEquidistant();
+      break;
     case 'conicConformal':
-      return geoConicConformal()
-        .rotate(def.rotate ?? [0, 0])
-        .parallels(def.parallels ?? [30, 60]);
+      proj = geoConicConformal();
+      break;
+    case 'conicEqualArea':
+      proj = geoConicEqualArea();
+      break;
+    case 'conicEquidistant':
+      proj = geoConicEquidistant();
+      break;
+    case 'albersEqualArea':
+      proj = geoAlbers();
+      break;
+    default:
+      throw new Error(`Proyección desconocida: ${(def as ProjectionDef).type}`);
   }
+
+  if (def.rotate) proj.rotate(def.rotate);
+  if (def.center) proj.center(def.center);
+  if (def.parallels && CONIC_TYPES.has(def.type)) (proj as GeoConicProjection).parallels(def.parallels);
+  if (def.scale) proj.scale(def.scale);
+  if (def.translate) proj.translate(def.translate);
+
+  return proj;
 }
 
-export async function loadMap(def: MapDef, container: HTMLElement): Promise<LoadedMap> {
+export async function loadMap(
+  def: MapDef,
+  projectionDef: ProjectionDef,
+  container: HTMLElement,
+): Promise<LoadedMap> {
   const res = await fetch(`data/${def.id}.json`);
   if (!res.ok) throw new Error(`No se pudo cargar data/${def.id}.json`);
   const topo = (await res.json()) as Topology;
@@ -52,7 +118,7 @@ export async function loadMap(def: MapDef, container: HTMLElement): Promise<Load
     CountryProps
   >;
 
-  const projection = makeProjection(def.projection).fitExtent(
+  const projection = makeProjection(projectionDef).fitExtent(
     [
       [PAD, PAD],
       [W - PAD, H - PAD],
@@ -65,8 +131,9 @@ export async function loadMap(def: MapDef, container: HTMLElement): Promise<Load
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
-  // Silueta del planeta (solo tiene sentido en proyecciones de mundo completo).
-  if (def.projection.type === 'equalEarth') {
+  // Silueta del planeta: solo tiene sentido en el mapamundi completo, nunca en
+  // un continente recortado (si no, aparece flotando dentro de un óvalo vacío).
+  if (def.id === 'world') {
     const sphere = document.createElementNS(SVG_NS, 'path');
     sphere.setAttribute('d', toPath({ type: 'Sphere' }) ?? '');
     sphere.setAttribute('class', 'sphere');
