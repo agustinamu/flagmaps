@@ -12,6 +12,13 @@ npm run dev        # desarrollo
 npm run build      # producción (dist/)
 ```
 
+Los scripts de datos usan dependencias pesadas (mapshaper, sharp) con su propio
+`scripts/package.json`, para que el CI no las instale. Antes del primer `build:*`:
+
+```sh
+npm --prefix scripts install
+```
+
 ## Pipeline de datos
 
 Los datos generados viven en `public/` y se regeneran con:
