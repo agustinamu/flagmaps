@@ -147,6 +147,16 @@ body {
   color: var(--text-dim);
 }
 
+/* Alto mínimo fijo, no a merced del interlineado de la fuente: con Archivo (menos
+   interlineado que la monoespaciada anterior) los controles bajaban de 29–32 px a
+   26–30 px. Guía §8: no reducir los objetivos táctiles. */
+#search,
+#map-select,
+#proj-select,
+button {
+  min-height: 2rem;
+}
+
 /* Barra densa: Archivo a ancho normal (100%), no al 112–115% de los rótulos, para
    que la barra conserve la densidad que tenía con la monoespaciada. */
 button {
@@ -240,6 +250,12 @@ button.accent:hover {
 
 #view-bar .view:last-child {
   border-right: none;
+}
+
+/* Segmentos: dentro del borde de 1px de su barra, que así mide 2rem como el resto. */
+#mode-bar .mode,
+#view-bar .view {
+  min-height: calc(2rem - 2px);
 }
 
 /* En modos de datos, los controles de banderas no aplican y sí la forma de comparar. */
