@@ -814,6 +814,7 @@ svg.data-mode .country:hover {
   padding: 0.5rem 0.9rem;
   background: rgba(30, 41, 37, 0.96);
   border: 1px solid var(--line);
+  backdrop-filter: blur(3px); /* overlay, como .ctx-menu, #legend y #tooltip */
   color: var(--text);
   font-family: var(--sans);
   font-size: 0.72rem;
