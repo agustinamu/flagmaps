@@ -766,6 +766,16 @@ svg.data-mode .country:hover {
   }
 }
 
+/* La barra de modos mide 348 px: por debajo de 380 px (348 + 2 × 16 de margen) se
+   salía de la pantalla (4 px a 360). Solo se estrecha el relleno lateral de los
+   segmentos; el alto no cambia y cada uno sigue por encima de 44 px de ancho. */
+@media (max-width: 379.98px) {
+  #mode-bar .mode,
+  #view-bar .view {
+    padding: 0.45rem 0.3rem;
+  }
+}
+
 /* Menú contextual (clic derecho sobre un país) */
 .ctx-menu {
   position: fixed;
