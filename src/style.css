@@ -1,6 +1,7 @@
 /* ── Pizarra cartográfica: pizarra verde, coral y tiza ──────────────── */
-/* Paleta canónica del portal (docs/guia-estilo.md §2 en el repo ekain): tokens por rol,
-   mismos nombres y valores en los cuatro repos. Contrastes WCAG medidos sobre --bg / --surface. */
+/* Paleta canónica: guía de estilo del portal (repo privado ekain-docs), §2. Tokens por
+   rol con los nombres y valores de la guía; cada repo declara solo los que usa, y aquí
+   no hacen falta --ok, --sky ni --sun. Contrastes WCAG medidos sobre --bg / --surface. */
 :root {
   color-scheme: dark; /* también tiñe los desplegables nativos (<select>, <datalist>) */
   --bg: #1e2925;
