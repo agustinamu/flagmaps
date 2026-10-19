@@ -221,7 +221,8 @@ button.accent:hover {
   border-right: none;
 }
 
-#mode-bar .mode.active {
+#mode-bar .mode.active,
+#view-bar .view.active {
   background: var(--accent);
   color: var(--bg);
 }
@@ -239,13 +240,6 @@ button.accent:hover {
 
 #view-bar .view:last-child {
   border-right: none;
-}
-
-/* Activo secundario en tono neutro (7,8:1): el coral queda para el modo activo,
-   que es la elección principal; dos segmentos coral seguidos competirían. */
-#view-bar .view.active {
-  background: var(--text-dim);
-  color: var(--bg);
 }
 
 /* En modos de datos, los controles de banderas no aplican y sí la forma de comparar. */
