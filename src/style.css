@@ -708,6 +708,35 @@ svg.data-mode .country:hover {
   letter-spacing: 0.03em;
 }
 
+/* Móvil: Archivo en mayúsculas espaciadas es más ancha que la monoespaciada de
+   antes y a 390 px la barra de modos y la fila de selectores se salían de la
+   pantalla. Margen lateral de 16 px, menos espaciado y segmentos más estrechos
+   (siguen por encima de 44 px de ancho). Va tras el pie para ganar a sus reglas base. */
+@media (max-width: 720px) {
+  #topbar {
+    padding: 0.7rem 1rem;
+  }
+
+  #map-select,
+  #proj-select,
+  button {
+    letter-spacing: 0.04em;
+  }
+
+  #mode-bar .mode,
+  #view-bar .view {
+    padding: 0.45rem 0.5rem;
+  }
+
+  /* Sin wrap, los textos de ayuda no bajan de su min-content (~570 px) y el
+     móvil reduce la página entera para que quepan. */
+  #statusbar {
+    flex-wrap: wrap;
+    gap: 0.2rem 1rem;
+    padding: 0.4rem 1rem;
+  }
+}
+
 /* Menú contextual (clic derecho sobre un país) */
 .ctx-menu {
   position: fixed;
