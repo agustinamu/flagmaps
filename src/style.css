@@ -430,7 +430,9 @@ svg.data-mode .country:hover {
   padding: 0.7rem 1rem 0.55rem;
   overflow-x: auto;
   overflow-y: hidden;
-  background: var(--surface);
+  /* Fondo océano, como el mapa: sobre --surface las clases bajas de la rampa quedaban
+     a 1,2–2,5:1; sobre el océano suben a 1,6–3,4:1 y el filete de .cmp svg path las perfila. */
+  background: var(--ocean);
   border-top: 1px solid var(--line);
   scrollbar-width: thin;
 }
@@ -473,6 +475,15 @@ svg.data-mode .country:hover {
 
 .cmp svg {
   display: block;
+}
+
+/* Filete como el de .sphere, algo más opaco: 3,6 / 3,4 / 3,2:1 sobre océano, :hover y
+   .active (a 0,5 el activo bajaba a 2,9:1). Perfila las siluetas oscuras de la rampa. */
+.cmp svg path {
+  stroke: var(--line);
+  stroke-opacity: 0.55;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
 }
 
 .cmp figcaption {
