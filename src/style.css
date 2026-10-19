@@ -112,7 +112,11 @@ body {
   font-family: var(--sans);
   font-size: 0.78rem;
   padding: 0.45rem 0.7rem;
-  width: 13rem;
+  /* 12rem (antes 13rem): en Archivo los nombres son más estrechos que en la
+     monoespaciada y no caben 6 de los 236, frente a 8 antes. Los 16 px que libera
+     hacen falta en modo banderas: sin ellos, la cabecera tiene una fila más que en
+     main entre 1672 y 1686 px, y 1,6 px más de alto entre 1560 y 1574. */
+  width: 12rem;
   transition: border-color 0.15s;
 }
 
@@ -165,9 +169,10 @@ button {
 /* Barra densa: Archivo a ancho normal (100%), no al 112–115% de los rótulos, para
    que la barra conserve la densidad que tenía con la monoespaciada. Espaciado de
    0.04em aquí y en #map-select/#proj-select: con el 0.08em de la monoespaciada, la
-   cabecera ganaba una fila a 1366 px (148 → 185 px de alto). A 0.04em tiene el
-   mismo número de filas que antes de 1024 a 1440 px; a 0.05em también, pero a
-   1280 px el separador quedaba huérfano al final de la primera fila. */
+   cabecera ganaba una fila a 1366 px (148 → 185 px de alto). Con 0.04em, el relleno
+   de los segmentos y el ancho de #search, la cabecera no tiene más filas ni más altura
+   que en main en ningún ancho de 721 a 1920 px, en los cuatro modos (barrido de
+   1 px). A 0.05em vuelve a ganar una fila (1310–1318 px en los modos de datos). */
 button {
   background: transparent;
   border: 1px solid var(--line);
@@ -233,7 +238,6 @@ button.accent:hover {
 #mode-bar .mode {
   border: none;
   border-right: 1px solid var(--line);
-  padding: 0.45rem 0.65rem;
 }
 
 #mode-bar .mode:last-child {
@@ -254,16 +258,20 @@ button.accent:hover {
 #view-bar .view {
   border: none;
   border-right: 1px solid var(--line);
-  padding: 0.45rem 0.65rem;
 }
 
 #view-bar .view:last-child {
   border-right: none;
 }
 
-/* Segmentos: dentro del borde de 1px de su barra, que así mide 2rem como el resto. */
+/* Segmentos: dentro del borde de 1px de su barra, que así mide 2rem como el resto.
+   Relleno lateral de 0.5rem (antes 0.65rem): la marca en Archivo mide 31 px más que
+   con la tipografía anterior y, con 0.65rem, la cabecera tenía una fila más que en
+   main entre 1310 y 1337 px en los modos de datos y en tres franjas del modo banderas
+   (1335–1338, 1447–1450 y 1672–1705 px). */
 #mode-bar .mode,
 #view-bar .view {
+  padding: 0.45rem 0.5rem;
   min-height: calc(2rem - 2px);
 }
 
@@ -746,16 +754,10 @@ svg.data-mode .country:hover {
 
 /* Móvil: Archivo en mayúsculas es más ancha que la monoespaciada de antes y a
    390 px la barra de modos y la fila de selectores se salían de la pantalla.
-   Margen lateral de 16 px y segmentos más estrechos (siguen por encima de 44 px
-   de ancho). Va tras el pie para ganar a sus reglas base. */
+   Margen lateral de 16 px. Va tras el pie para ganar a sus reglas base. */
 @media (max-width: 720px) {
   #topbar {
     padding: 0.7rem 1rem;
-  }
-
-  #mode-bar .mode,
-  #view-bar .view {
-    padding: 0.45rem 0.5rem;
   }
 
   /* Sin wrap, los textos de ayuda no bajan de su min-content (~570 px) y el
