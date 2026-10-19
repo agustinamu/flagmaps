@@ -436,7 +436,10 @@ svg.data-mode .country:hover {
   align-items: center;
   justify-content: flex-end;
   gap: 0.35rem;
-  min-width: 3.6rem;
+  /* Sin encoger: con la tira desbordada, cada figura bajaba a un mínimo más estrecho
+     que su pie (5.5rem) y su silueta, y nombres, valores y siluetas se montaban sobre
+     las vecinas. Así la tira hace scroll y cada figura ocupa lo que mide. */
+  flex-shrink: 0;
   cursor: pointer;
   border: 1px solid transparent;
   padding: 0.3rem 0.25rem 0.2rem;
