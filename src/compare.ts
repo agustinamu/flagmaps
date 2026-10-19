@@ -43,7 +43,7 @@ export function renderCompare(
       svg.setAttribute('viewBox', `${main.box.x} ${main.box.y} ${main.box.w} ${main.box.h}`);
       svg.setAttribute('width', ((main.box.w / dim) * side).toFixed(1));
       svg.setAttribute('height', ((main.box.h / dim) * side).toFixed(1));
-      const fill = c.el.style.fill || '#876b3b';
+      const fill = c.el.style.fill || '#737244'; // clase central de la rampa
       for (const piece of main.pieces) {
         const p = document.createElementNS(SVG_NS, 'path');
         p.setAttribute('d', piece.getAttribute('d') ?? '');

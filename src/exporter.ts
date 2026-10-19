@@ -1,5 +1,7 @@
 // Export del mapa en versión clara apta para impresión:
 // SVG vectorial (ideal para imprimir a cualquier tamaño) y PNG en alta resolución.
+// Paleta propia, al margen del tema oscuro de la página: es para papel blanco. En
+// modo datos viaja la rampa del choropleth tal cual; también se lee sobre blanco.
 const PRINT_LAND = '#e9e5dc';
 const PRINT_BORDER = '#8b8578';
 const PRINT_OCEAN = '#ffffff';

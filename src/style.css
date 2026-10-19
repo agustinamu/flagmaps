@@ -1,20 +1,24 @@
-/* ── Sala de cartografía: tinta nocturna, latón y papel ─────────────── */
-/* Paleta canónica del portal (docs/guia-estilo.md §2 en el repo ekain): mismos nombres y valores en los tres repos. */
+/* ── Pizarra cartográfica: pizarra verde, coral y tiza ──────────────── */
+/* Paleta canónica del portal (docs/guia-estilo.md §2 en el repo ekain): tokens por rol,
+   mismos nombres y valores en los cuatro repos. Contrastes WCAG medidos sobre --bg / --surface. */
 :root {
-  color-scheme: dark;
-  --ink: #0b131c;
-  --ink-2: #101b27;
-  --ocean: #0e1822;
-  --land: #2b3a47;
-  --land-hover: #3d5266;
-  --border: #0a1118;
-  --brass: #d2a14c;
-  --brass-soft: #8a6f3d;
-  --paper: #ece5d3;
-  --paper-dim: #9a937f;
-  --bad: #d47d6a;
-  --display: 'Fraunces', Georgia, serif;
-  --mono: 'IBM Plex Mono', monospace;
+  color-scheme: dark; /* también tiñe los desplegables nativos (<select>, <datalist>) */
+  --bg: #1e2925;
+  --surface: #2a3732;
+  --text: #f1efe6; /* 13,0 / 10,8 */
+  --text-dim: #b7bdb3; /* 7,8 / 6,5 */
+  --line: #b7bdb3;
+  --line-soft: rgba(241, 239, 230, 0.25);
+  --accent: #e8866b; /* 5,8 / 4,8 */
+  --accent-rgb: 232, 134, 107;
+  --bad: #ff9fb5; /* 7,8 / 6,4 */
+  --sans: 'Archivo', system-ui, sans-serif;
+  --serif: 'Instrument Serif', Georgia, serif;
+  /* Colores locales del mapa (no forman parte de la paleta compartida). */
+  --ocean: #16201c;
+  --land: #3a4a42;
+  --land-hover: #4a5d53;
+  --border: #1e2925;
 }
 
 * {
@@ -30,9 +34,9 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
   overflow: hidden;
 }
 
@@ -43,34 +47,41 @@ body {
   flex-wrap: wrap;
   gap: 0.6rem 1.5rem;
   padding: 0.7rem 1.4rem;
-  background: linear-gradient(180deg, var(--ink-2), var(--ink));
-  border-bottom: 1px solid var(--brass-soft);
-  box-shadow: 0 1px 0 rgba(210, 161, 76, 0.15);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
   z-index: 10;
 }
 
 .brand h1 {
   margin: 0;
   white-space: nowrap;
-  font-family: var(--display);
-  font-weight: 500;
+  font-weight: 800;
+  font-stretch: 118%;
   font-size: 1.45rem;
-  letter-spacing: 0.02em;
-  color: var(--paper);
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 
-.brand h1 em {
+/* Parte del wordmark en acento: itálica de Instrument Serif, recurso de marca.
+   1.1em porque su altura de x es menor que la de Archivo y a igual tamaño encoge. */
+.brand h1 .accent {
+  font-family: var(--serif);
   font-style: italic;
-  font-weight: 300;
-  color: var(--brass);
+  font-weight: 400;
+  font-stretch: 100%;
+  font-size: 1.1em;
+  letter-spacing: 0;
+  color: var(--accent);
 }
 
 .brand .sub {
   display: block;
   font-size: 0.6rem;
-  letter-spacing: 0.34em;
+  font-weight: 600;
+  font-stretch: 112%;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--paper-dim);
+  color: var(--text-dim);
   margin-top: 0.1rem;
 }
 
@@ -85,56 +96,66 @@ body {
 .controls .sep {
   width: 1px;
   height: 1.4rem;
-  background: var(--brass-soft);
-  opacity: 0.5;
+  background: var(--line-soft);
   margin: 0 0.3rem;
 }
 
 #search {
-  background: var(--ocean);
-  border: 1px solid var(--brass-soft);
-  color: var(--paper);
-  font-family: var(--mono);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--sans);
   font-size: 0.78rem;
   padding: 0.45rem 0.7rem;
   width: 13rem;
-  outline: none;
   transition: border-color 0.15s;
 }
 
 #search:focus {
-  border-color: var(--brass);
+  border-color: var(--accent);
 }
 
 #map-select,
 #proj-select {
-  background: var(--ocean);
-  border: 1px solid var(--brass);
-  color: var(--brass);
-  font-family: var(--mono);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--sans);
   font-size: 0.72rem;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0.42rem 0.5rem;
   cursor: pointer;
-  outline: none;
+  transition: border-color 0.15s;
 }
 
+#map-select:hover,
+#proj-select:hover {
+  border-color: var(--accent);
+}
+
+/* Foco de campos: el cambio de color de borde de 1px no basta (~2:1 entre estados). */
+#search:focus-visible,
 #map-select:focus-visible,
 #proj-select:focus-visible {
-  border-color: var(--paper);
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
 }
 
 #search::placeholder {
-  color: var(--paper-dim);
+  color: var(--text-dim);
 }
 
+/* Barra densa: Archivo a ancho normal (100%), no al 112–115% de los rótulos, para
+   que la barra conserve la densidad que tenía con la monoespaciada. */
 button {
   background: transparent;
-  border: 1px solid var(--brass-soft);
-  color: var(--paper);
-  font-family: var(--mono);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--sans);
   font-size: 0.72rem;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0.45rem 0.8rem;
@@ -146,25 +167,31 @@ button {
 }
 
 button:hover {
-  border-color: var(--brass);
-  background: rgba(210, 161, 76, 0.08);
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.08);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 button.accent {
-  color: var(--brass);
-  border-color: var(--brass);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 button.accent:hover {
-  background: var(--brass);
-  color: var(--ink);
+  background: var(--accent);
+  color: var(--bg);
 }
 
 .counter {
-  font-family: var(--display);
   font-size: 1.5rem;
-  font-weight: 300;
-  color: var(--brass);
+  font-weight: 800;
+  font-stretch: 115%;
+  letter-spacing: -0.01em;
+  color: var(--accent);
   min-width: 5.5rem;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -172,18 +199,21 @@ button.accent:hover {
 
 .counter .total {
   font-size: 0.85rem;
-  color: var(--paper-dim);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+  color: var(--text-dim);
 }
 
 /* ── Modos de vista ─────────────────────────────────────────────────── */
 #mode-bar {
   display: flex;
-  border: 1px solid var(--brass-soft);
+  border: 1px solid var(--line);
 }
 
 #mode-bar .mode {
   border: none;
-  border-right: 1px solid var(--brass-soft);
+  border-right: 1px solid var(--line);
   padding: 0.45rem 0.65rem;
 }
 
@@ -192,18 +222,18 @@ button.accent:hover {
 }
 
 #mode-bar .mode.active {
-  background: var(--brass);
-  color: var(--ink);
+  background: var(--accent);
+  color: var(--bg);
 }
 
 #view-bar {
   display: none;
-  border: 1px solid var(--brass-soft);
+  border: 1px solid var(--line);
 }
 
 #view-bar .view {
   border: none;
-  border-right: 1px solid var(--brass-soft);
+  border-right: 1px solid var(--line);
   padding: 0.45rem 0.65rem;
 }
 
@@ -211,9 +241,11 @@ button.accent:hover {
   border-right: none;
 }
 
+/* Activo secundario en tono neutro (7,8:1): el coral queda para el modo activo,
+   que es la elección principal; dos segmentos coral seguidos competirían. */
 #view-bar .view.active {
-  background: var(--brass-soft);
-  color: var(--ink);
+  background: var(--text-dim);
+  color: var(--bg);
 }
 
 /* En modos de datos, los controles de banderas no aplican y sí la forma de comparar. */
@@ -245,9 +277,7 @@ body.mode-data #view-bar {
 #map-container {
   flex: 1;
   min-height: 0;
-  background:
-    radial-gradient(ellipse at 50% 40%, rgba(210, 161, 76, 0.05), transparent 65%),
-    var(--ocean);
+  background: var(--ocean);
   position: relative; /* ancla de #legend */
 }
 
@@ -273,13 +303,17 @@ body.mode-data #view-bar {
 /* Los trazos llevan vector-effect: non-scaling-stroke (grosor en píxeles de
    pantalla, constante al hacer zoom). */
 .sphere {
-  fill: #101c28;
-  stroke: var(--brass-soft);
+  fill: var(--ocean);
+  /* Filete del planeta a 3,2:1 sobre el océano: visible sin competir con las fronteras. */
+  stroke: var(--line);
+  stroke-opacity: 0.5;
   stroke-width: 1px;
 }
 
+/* Territorios sin ISO (no interactivos): a medio camino entre océano y tierra,
+   más oscuros que la clase más baja del choropleth para no confundirse con ella. */
 .land {
-  fill: #222e39;
+  fill: color-mix(in srgb, var(--land) 50%, var(--ocean));
   stroke: var(--border);
   stroke-width: 0.6px;
 }
@@ -297,7 +331,7 @@ body.mode-data #view-bar {
 }
 
 .country.has-flag {
-  stroke: var(--brass);
+  stroke: var(--accent);
   stroke-width: 0.8px;
 }
 
@@ -335,23 +369,24 @@ svg.data-mode .country:hover {
   bottom: 1rem;
   width: 15rem;
   padding: 0.6rem 0.75rem;
-  background: rgba(11, 19, 28, 0.88);
-  border: 1px solid var(--brass-soft);
+  background: rgba(30, 41, 37, 0.92);
+  border: 1px solid var(--line);
   backdrop-filter: blur(3px);
 }
 
 .legend-title {
   font-size: 0.62rem;
+  font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--paper-dim);
+  color: var(--text-dim);
   margin-bottom: 0.45rem;
 }
 
 .legend-bar {
   display: flex;
   height: 0.55rem;
-  border: 1px solid rgba(236, 229, 211, 0.2);
+  border: 1px solid var(--line-soft);
 }
 
 .legend-bar span {
@@ -362,17 +397,18 @@ svg.data-mode .country:hover {
   display: flex;
   justify-content: space-between;
   font-size: 0.62rem;
-  color: var(--paper);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
   margin-top: 0.3rem;
 }
 
 .legend-source {
   margin-top: 0.45rem;
   padding-top: 0.35rem;
-  border-top: 1px solid rgba(210, 161, 76, 0.2);
+  border-top: 1px solid var(--line-soft);
   font-size: 0.68rem;
   letter-spacing: 0.03em;
-  color: var(--paper-dim);
+  color: var(--text-dim);
 }
 
 /* ── Tira de comparación ────────────────────────────────────────────── */
@@ -384,8 +420,8 @@ svg.data-mode .country:hover {
   padding: 0.7rem 1rem 0.55rem;
   overflow-x: auto;
   overflow-y: hidden;
-  background: var(--ink-2);
-  border-top: 1px solid var(--brass-soft);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
   scrollbar-width: thin;
 }
 
@@ -407,13 +443,19 @@ svg.data-mode .country:hover {
 }
 
 .cmp:hover {
-  border-color: var(--brass-soft);
-  background: rgba(210, 161, 76, 0.07);
+  border-color: var(--line);
+  background: rgba(var(--accent-rgb), 0.07);
 }
 
 .cmp.active {
-  border-color: var(--brass);
-  background: rgba(210, 161, 76, 0.14);
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.14);
+}
+
+/* Hacia dentro: la tira recorta lo que sobresale (overflow-y: hidden). */
+.cmp:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .cmp svg {
@@ -436,9 +478,12 @@ svg.data-mode .country:hover {
   white-space: nowrap;
 }
 
+/* Valores en --text, no en acento: el coral sobre los tintes coral de :hover/.active
+   baja a 3,9–4,3:1. El acento lo pone el borde del activo. */
 .cmp .vl {
   font-size: 0.68rem;
-  color: var(--brass);
+  font-weight: 600;
+  color: var(--text);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -448,8 +493,8 @@ svg.data-mode .country:hover {
   width: 20rem;
   display: flex;
   flex-direction: column;
-  background: var(--ink-2);
-  border-left: 1px solid var(--brass-soft);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
 }
 
 #ranking[hidden] {
@@ -459,11 +504,12 @@ svg.data-mode .country:hover {
 #ranking h2 {
   margin: 0;
   padding: 0.7rem 1rem 0.6rem;
-  font-family: var(--display);
-  font-weight: 500;
+  font-weight: 800;
+  font-stretch: 115%;
   font-size: 1.05rem;
-  color: var(--brass);
-  border-bottom: 1px solid rgba(210, 161, 76, 0.25);
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  border-bottom: 1px solid var(--line-soft);
 }
 
 #ranking-list {
@@ -482,23 +528,31 @@ svg.data-mode .country:hover {
   cursor: pointer;
 }
 
-#ranking-list li:hover {
-  background: rgba(210, 161, 76, 0.09);
-}
-
+/* La cebra va antes que :hover: con igual especificidad, la última regla gana
+   y las filas impares se quedaban sin realce al pasar el ratón. */
 #ranking-list li:nth-child(odd) {
   background: rgba(255, 255, 255, 0.02);
 }
 
+#ranking-list li:hover {
+  background: rgba(var(--accent-rgb), 0.09);
+}
+
 #ranking-list li.active {
-  background: rgba(210, 161, 76, 0.16);
-  outline: 1px solid var(--brass-soft);
+  background: rgba(var(--accent-rgb), 0.16);
+  outline: 1px solid var(--line);
+}
+
+/* Hacia dentro: la lista tiene overflow-y: auto y recortaría el contorno. */
+#ranking-list li:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 #ranking-list .rk {
   min-width: 2rem;
   text-align: right;
-  color: var(--paper-dim);
+  color: var(--text-dim);
   font-variant-numeric: tabular-nums;
 }
 
@@ -509,8 +563,10 @@ svg.data-mode .country:hover {
   white-space: nowrap;
 }
 
+/* Mismo motivo que .cmp .vl: el coral no llega a 4,5:1 sobre las filas tintadas. */
 #ranking-list .vl {
-  color: var(--brass);
+  font-weight: 600;
+  color: var(--text);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -530,14 +586,14 @@ svg.data-mode .country:hover {
     width: auto;
     max-height: 45%;
     border-left: none;
-    border-top: 1px solid var(--brass-soft);
+    border-top: 1px solid var(--line);
   }
 }
 
 @keyframes flash {
   0%,
   60% {
-    stroke: var(--brass);
+    stroke: var(--accent);
     stroke-width: 3px;
   }
   100% {
@@ -549,8 +605,8 @@ svg.data-mode .country:hover {
 #tooltip {
   position: fixed;
   pointer-events: none;
-  background: rgba(11, 19, 28, 0.92);
-  border: 1px solid var(--brass-soft);
+  background: rgba(30, 41, 37, 0.92);
+  border: 1px solid var(--line);
   padding: 0.45rem 0.65rem;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
@@ -573,7 +629,7 @@ svg.data-mode .country:hover {
   width: 1.7rem;
   height: 1.15rem;
   object-fit: cover;
-  border: 1px solid rgba(236, 229, 211, 0.25);
+  border: 1px solid var(--line-soft);
 }
 
 #tt-stats {
@@ -589,9 +645,10 @@ svg.data-mode .country:hover {
 }
 
 #tt-stats dt {
-  color: var(--paper-dim);
+  color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.09em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   font-size: 0.68rem;
   align-self: baseline;
 }
@@ -602,13 +659,13 @@ svg.data-mode .country:hover {
   font-variant-numeric: tabular-nums;
 }
 
-/* Métrica del modo activo resaltada. */
+/* Métrica del modo activo resaltada (coral sobre el overlay: 5,8:1, 4,5 sobre blanco). */
 #tt-stats .hl dt {
-  color: var(--brass);
+  color: var(--accent);
 }
 
 #tt-stats .hl dd {
-  color: var(--brass);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -620,23 +677,29 @@ svg.data-mode .country:hover {
   font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--paper-dim);
-  background: var(--ink-2);
-  border-top: 1px solid rgba(210, 161, 76, 0.25);
+  color: var(--text-dim);
+  background: var(--surface);
+  border-top: 1px solid var(--line-soft);
 }
 
 #statusbar b {
-  color: var(--brass);
-  font-weight: 500;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 #statusbar .back {
-  color: var(--paper-dim);
+  color: var(--text-dim);
   text-decoration: none;
 }
 
 #statusbar .back:hover {
-  color: var(--brass);
+  color: var(--accent);
+}
+
+#statusbar .back:focus-visible {
+  color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 #statusbar .credit {
@@ -652,8 +715,8 @@ svg.data-mode .country:hover {
   display: flex;
   flex-direction: column;
   min-width: 12rem;
-  background: rgba(11, 19, 28, 0.96);
-  border: 1px solid var(--brass-soft);
+  background: rgba(30, 41, 37, 0.96);
+  border: 1px solid var(--line);
   backdrop-filter: blur(3px);
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
 }
@@ -662,8 +725,8 @@ svg.data-mode .country:hover {
   appearance: none;
   background: none;
   border: 0;
-  color: var(--paper);
-  font-family: var(--mono);
+  color: var(--text);
+  font-family: var(--sans);
   font-size: 0.72rem;
   letter-spacing: 0.03em;
   text-align: left;
@@ -671,11 +734,16 @@ svg.data-mode .country:hover {
   cursor: pointer;
 }
 
+/* Fondo --surface y no --land-hover: el coral sobre la tierra realzada se queda en 2,7:1. */
 .ctx-menu button:hover,
 .ctx-menu button:focus-visible {
-  background: var(--land-hover);
-  color: var(--brass);
-  outline: none;
+  background: var(--surface);
+  color: var(--accent);
+}
+
+.ctx-menu button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 /* Aviso efímero de confirmación */
@@ -686,10 +754,10 @@ svg.data-mode .country:hover {
   transform: translate(-50%, 1rem);
   z-index: 50;
   padding: 0.5rem 0.9rem;
-  background: rgba(11, 19, 28, 0.96);
-  border: 1px solid var(--brass-soft);
-  color: var(--paper);
-  font-family: var(--mono);
+  background: rgba(30, 41, 37, 0.96);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--sans);
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   opacity: 0;
@@ -706,5 +774,5 @@ svg.data-mode .country:hover {
 
 .toast[data-kind='bad'] {
   border-color: var(--bad);
-  color: var(--paper);
+  color: var(--text);
 }

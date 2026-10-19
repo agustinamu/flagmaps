@@ -1,5 +1,6 @@
 // Coloreado del mapa por magnitud (choropleth) con leyenda. Rampa secuencial
-// de un solo tono (latón, OKLCH L 0.38→0.87) en 7 clases por cuantiles:
+// de oliva a amarillo sol (rampa canónica del portal, OKLCH L 0.37→0.88, pasos
+// de luminosidad casi iguales) en 7 clases por cuantiles:
 // población, superficie y densidad son distribuciones tan sesgadas que una
 // escala lineal (o incluso log continua) deja casi todos los países en el
 // mismo color; los cuantiles reparten los países por igual entre clases.
@@ -8,7 +9,7 @@
 import type { LoadedMap } from './geo';
 import { METRICS, formatCompact, type Metric, type StatsFile } from './stats';
 
-const RAMP = ['#4f4026', '#6a5530', '#876b3b', '#a58245', '#c49a50', '#e1b25f', '#fccc79'];
+const RAMP = ['#3b4234', '#565a3c', '#737244', '#918a4c', '#b0a255', '#d1bb62', '#f2d675'];
 
 export interface Choropleth {
   /** Valor de la métrica por iso (solo países presentes en el mapa con datos). */
@@ -37,7 +38,7 @@ export function paintChoropleth(map: LoadedMap, stats: StatsFile, metric: Metric
 
   for (const c of map.countries.values()) {
     const v = values.get(c.iso);
-    // Sin datos (o cero): conserva el gris azulado base del mapa.
+    // Sin datos (o cero): conserva el gris verdoso base del mapa (--land).
     c.el.style.fill = v ? RAMP[classOf(v)] : '';
   }
   return { values };
