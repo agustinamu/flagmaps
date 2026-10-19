@@ -552,18 +552,21 @@ svg.data-mode .country:hover {
   font-size: 0.74rem;
 }
 
+/* Interlineado 1.3, como las opciones de lista de geojuegos: con el normal de Archivo
+   las filas (clicables y enfocables) bajaban de 23,9 a 20,9 px. A 1.3 miden 24,3. */
 #ranking-list li {
   display: flex;
   align-items: baseline;
   gap: 0.6rem;
   padding: 0.28rem 1rem;
+  line-height: 1.3;
   cursor: pointer;
 }
 
 /* La cebra va antes que :hover: con igual especificidad, la última regla gana
    y las filas impares se quedaban sin realce al pasar el ratón. */
 #ranking-list li:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(241, 239, 230, 0.02);
 }
 
 #ranking-list li:hover {
