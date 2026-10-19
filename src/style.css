@@ -58,6 +58,10 @@ body {
   font-weight: 800;
   font-stretch: 118%;
   font-size: 1.45rem;
+  /* Con interlineado normal, la itálica de .accent (1.1em, más alta) estiraba la línea
+     a 33 px y la marca medía 44,6 px frente a 43,6 antes del cambio de fuente: en
+     modos de datos, la cabecera crecía 1 px. A 1.2 la marca mide 42,2 px. */
+  line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--text);
 }
@@ -123,7 +127,7 @@ body {
   font-family: var(--sans);
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 0.42rem 0.5rem;
   cursor: pointer;
@@ -158,7 +162,11 @@ button {
 }
 
 /* Barra densa: Archivo a ancho normal (100%), no al 112–115% de los rótulos, para
-   que la barra conserve la densidad que tenía con la monoespaciada. */
+   que la barra conserve la densidad que tenía con la monoespaciada. Espaciado de
+   0.04em aquí y en #map-select/#proj-select: con el 0.08em de la monoespaciada, la
+   cabecera ganaba una fila a 1366 px (148 → 185 px de alto). A 0.04em tiene el
+   mismo número de filas que antes de 1024 a 1440 px; a 0.05em también, pero a
+   1280 px el separador quedaba huérfano al final de la primera fila. */
 button {
   background: transparent;
   border: 1px solid var(--line);
@@ -166,7 +174,7 @@ button {
   font-family: var(--sans);
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 0.45rem 0.8rem;
   cursor: pointer;
@@ -732,19 +740,13 @@ svg.data-mode .country:hover {
   letter-spacing: 0.03em;
 }
 
-/* Móvil: Archivo en mayúsculas espaciadas es más ancha que la monoespaciada de
-   antes y a 390 px la barra de modos y la fila de selectores se salían de la
-   pantalla. Margen lateral de 16 px, menos espaciado y segmentos más estrechos
-   (siguen por encima de 44 px de ancho). Va tras el pie para ganar a sus reglas base. */
+/* Móvil: Archivo en mayúsculas es más ancha que la monoespaciada de antes y a
+   390 px la barra de modos y la fila de selectores se salían de la pantalla.
+   Margen lateral de 16 px y segmentos más estrechos (siguen por encima de 44 px
+   de ancho). Va tras el pie para ganar a sus reglas base. */
 @media (max-width: 720px) {
   #topbar {
     padding: 0.7rem 1rem;
-  }
-
-  #map-select,
-  #proj-select,
-  button {
-    letter-spacing: 0.04em;
   }
 
   #mode-bar .mode,
