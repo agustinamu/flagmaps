@@ -22,7 +22,7 @@
         <h1>Atlas <span class="accent">de</span> Banderas</h1>
         <span class="sub">— natural earth · d3 —</span>
       </div>
-      <div class="controls">
+      <div class="controls" id="controls">
         <select id="map-select" title="Mapa"></select>
         <select id="proj-select" title="Proyección"></select>
         <nav id="mode-bar" aria-label="Modo de vista">
@@ -52,6 +52,16 @@
       </div>
       <div class="counter" title="Países con bandera">
         <span id="count">0</span><span class="total">/&nbsp;<span id="total">0</span></span>
+      </div>
+      <div class="bar-actions">
+        <button id="btn-fullscreen" title="Pantalla completa" aria-pressed="false" hidden>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" />
+          </svg>
+        </button>
+        <button id="btn-menu" title="Controles" aria-controls="controls" aria-expanded="false">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 3h14M1 8h14M1 13h14" /></svg>
+        </button>
       </div>
     </header>
 

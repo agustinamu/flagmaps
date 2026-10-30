@@ -399,6 +399,43 @@ function init(): void {
   $('#btn-svg').addEventListener('click', () => exportSVG(ctx.map.svg, ctx.def.id));
   $('#btn-png').addEventListener('click', () => void exportPNG(ctx.map.svg, ctx.def.id));
 
+  // Cabecera plegable (solo visible en táctil de poca altura, ver style.css): los
+  // controles se abren sobre el mapa. Tocar el mapa los cierra sin pintar bandera.
+  const menuBtn = $('#btn-menu');
+  const setMenu = (open: boolean) => {
+    document.body.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+  };
+  menuBtn.addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
+  $('#content').addEventListener(
+    'click',
+    (e) => {
+      if (!document.body.classList.contains('menu-open')) return;
+      e.stopPropagation();
+      setMenu(false);
+    },
+    true,
+  );
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setMenu(false);
+  });
+
+  // Pantalla completa: en la tablet, la barra de Chrome y la de Android se comen
+  // ~120 px de alto. Sin soporte (iPhone), el botón queda oculto.
+  const fsBtn = $('#btn-fullscreen');
+  if (document.fullscreenEnabled) {
+    fsBtn.hidden = false;
+    fsBtn.addEventListener('click', () => {
+      const req = document.fullscreenElement
+        ? document.exitFullscreen()
+        : document.documentElement.requestFullscreen();
+      req.catch(() => toast('No se pudo cambiar a pantalla completa', 'bad'));
+    });
+    document.addEventListener('fullscreenchange', () =>
+      fsBtn.setAttribute('aria-pressed', String(!!document.fullscreenElement)),
+    );
+  }
+
   loadStats()
     .then((s) => (stats = s))
     .catch(console.error);

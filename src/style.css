@@ -229,6 +229,20 @@ button.accent:hover {
   color: var(--text-dim);
 }
 
+/* Por encima del corte móvil, los controles comparten fila con la marca y se reparten
+   en filas a su derecha: si no cabían enteros al lado, bajaban todos bajo la marca y
+   esta ocupaba una fila sola (tablet apaisada, 1035 px: cabecera de 183 → 135 px en
+   banderas y de 148 → 95 en los modos de datos). Desde 767 px: entre 755 y 766, marca,
+   controles (a su min-content, 348 px) y contador caben en una línea y los controles se
+   apilan en 5 filas (cabecera de 183 → 211–215 px). Barrido de 1 px de 767 a 1920, en
+   banderas y en datos: la cabecera nunca crece respecto a main. */
+@media (min-width: 767px) {
+  .controls {
+    flex: 1 1 0;
+    justify-content: flex-end;
+  }
+}
+
 /* ── Modos de vista ─────────────────────────────────────────────────── */
 #mode-bar {
   display: flex;
@@ -752,6 +766,14 @@ svg.data-mode .country:hover {
   letter-spacing: 0.03em;
 }
 
+/* Táctil: las pistas son de ratón (clic dcho, rueda) y, partidas en dos líneas,
+   doblaban el alto del pie. Queda la vuelta y el crédito, en una línea. */
+@media (pointer: coarse) {
+  #statusbar > span:not(.credit) {
+    display: none;
+  }
+}
+
 /* Móvil: Archivo en mayúsculas es más ancha que la monoespaciada de antes y a
    390 px la barra de modos y la fila de selectores se salían de la pantalla.
    Margen lateral de 16 px. Va tras el pie para ganar a sus reglas base. */
@@ -776,6 +798,81 @@ svg.data-mode .country:hover {
   #mode-bar .mode,
   #view-bar .view {
     padding: 0.45rem 0.3rem;
+  }
+}
+
+/* ── Cabecera plegable ──────────────────────────────────────────────── */
+/* Táctil de poca altura (tablet apaisada, 1035×557 con la barra de Chrome; móvil
+   apaisado): aun compactos, los controles ocupaban 3 filas (135 px de 557). La barra
+   queda en marca + contador + ☰ y los controles se abren encima del mapa. 720 y no
+   640: en pantalla completa la tablet mide ~677 px y el botón para salir tiene que
+   seguir ahí. pointer: coarse deja fuera el escritorio con la ventana baja. */
+.bar-actions {
+  display: none;
+  gap: 0.5rem;
+}
+
+.bar-actions button {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  padding: 0;
+}
+
+.bar-actions svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+#btn-fullscreen[hidden] {
+  display: none;
+}
+
+#btn-fullscreen[aria-pressed='true'],
+#btn-menu[aria-expanded='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+@media (max-height: 720px) and (pointer: coarse) {
+  #topbar {
+    position: relative; /* ancla del panel de controles */
+    flex-wrap: nowrap;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .brand .sub {
+    display: none;
+  }
+
+  .brand {
+    margin-right: auto;
+  }
+
+  .bar-actions {
+    display: flex;
+  }
+
+  .controls {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    justify-content: flex-end;
+    padding: 0.7rem 1.4rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+  }
+
+  body.menu-open .controls {
+    display: flex;
   }
 }
 
