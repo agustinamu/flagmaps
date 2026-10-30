@@ -457,7 +457,9 @@ svg.data-mode .country:hover {
   display: flex;
   align-items: flex-end;
   gap: 1.1rem;
-  height: 12rem;
+  /* Lado de la silueta mayor (compare.ts); la tira suma 82 px de pie y rellenos: 192 px. */
+  --cmp-side: 110px;
+  height: calc(var(--cmp-side) + 82px);
   padding: 0.7rem 1rem 0.55rem;
   overflow-x: auto;
   overflow-y: hidden;
@@ -873,6 +875,11 @@ svg.data-mode .country:hover {
 
   body.menu-open .controls {
     display: flex;
+  }
+
+  /* La tira de «Línea» dejaba el mapa en 242 px; con siluetas de 56 px mide 138. */
+  #compare {
+    --cmp-side: 56px;
   }
 }
 

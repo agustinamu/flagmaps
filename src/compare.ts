@@ -10,9 +10,9 @@ import { formatCompact, formatValue, yearLabel, type Metric, type StatsFile } fr
 import type { Choropleth } from './choropleth';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-// Lado mayor (px) de la silueta más grande y mínimo visible para las demás.
-const MAX_SIDE = 110;
-const MIN_SIDE = 8;
+// El lado mayor de la silueta más grande es --cmp-side (style.css: 110 px, menos en
+// pantallas bajas); las demás, una fracción de él, con un mínimo visible (8 de 110 px).
+const MIN_FRAC = 8 / 110;
 
 export function renderCompare(
   strip: HTMLElement,
@@ -36,13 +36,13 @@ export function renderCompare(
       if (!clusters.length) return [];
       const main = clusters.reduce((a, b) => (b.box.w * b.box.h > a.box.w * a.box.h ? b : a));
 
-      const side = Math.max(MIN_SIDE, MAX_SIDE * Math.sqrt(value / vmax));
+      const frac = Math.max(MIN_FRAC, Math.sqrt(value / vmax));
       const dim = Math.max(main.box.w, main.box.h);
 
       const svg = document.createElementNS(SVG_NS, 'svg');
       svg.setAttribute('viewBox', `${main.box.x} ${main.box.y} ${main.box.w} ${main.box.h}`);
-      svg.setAttribute('width', ((main.box.w / dim) * side).toFixed(1));
-      svg.setAttribute('height', ((main.box.h / dim) * side).toFixed(1));
+      svg.style.width = `calc(var(--cmp-side) * ${((main.box.w / dim) * frac).toFixed(4)})`;
+      svg.style.height = `calc(var(--cmp-side) * ${((main.box.h / dim) * frac).toFixed(4)})`;
       const fill = c.el.style.fill || '#737244'; // clase central de la rampa
       for (const piece of main.pieces) {
         const p = document.createElementNS(SVG_NS, 'path');
